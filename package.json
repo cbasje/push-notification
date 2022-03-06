@@ -13,7 +13,7 @@
 		"prebuild": "npm run clean && npm run mkdir && npm run copy",
 		"build": "tsc",
 		"prestart": "npm run build",
-		"start": "node ."
+		"start": "serve dist/client"
 	},
 	"dependencies": {
 		"@types/airtable": "^0.10.1",
