@@ -29,7 +29,7 @@ export const remove = async (
 	next: NextFunction
 ): Promise<void> => {
 	try {
-		const endpoint: string = req.query.endpoint?.toString();
+		const endpoint: string = req.query.endpoint as string;
 		if (!endpoint) {
 			res.sendStatus(400);
 			return;

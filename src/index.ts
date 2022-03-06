@@ -6,10 +6,13 @@ import webpush from './webpushConfig';
 
 import { post, remove, broadcast } from './subscriptionController';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const app = express();
 
 // Serve all files in client
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.post('/subscription', post);
