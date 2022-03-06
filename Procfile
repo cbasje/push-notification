@@ -1,2 +1,2 @@
-web: node dist/client/index.html
+web: node dist/client
 worker: node dist/app/index.js
