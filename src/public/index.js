@@ -25,11 +25,22 @@ const urlBase64ToUint8Array = (base64String) => {
 
 const subscribedElement = document.getElementById('subscribed');
 const unsubscribedElement = document.getElementById('unsubscribed');
+const notAvailableElement = document.getElementById('not-available');
 
 const setSubscribeMessage = async () => {
 	const registration = await navigator.serviceWorker.ready;
+
+	console.log(registration.pushManager);
+	if (!registration.pushManager) {
+		notAvailableElement.setAttribute('style', 'display: block');
+		subscribedElement.setAttribute('style', 'display: none');
+		unsubscribedElement.setAttribute('style', 'display: none');
+		return;
+	}
+
 	const subscription = await registration.pushManager.getSubscription();
 
+	notAvailableElement.setAttribute('style', 'display: none');
 	subscribedElement.setAttribute(
 		'style',
 		`display: ${subscription ? 'block' : 'none'};`
