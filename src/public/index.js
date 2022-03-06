@@ -23,17 +23,18 @@ const urlBase64ToUint8Array = (base64String) => {
 	return outputArray;
 };
 
-const getSubscribedElement = () => document.getElementById('subscribed');
-const getUnsubscribedElement = () => document.getElementById('unsubscribed');
+const subscribedElement = document.getElementById('subscribed');
+const unsubscribedElement = document.getElementById('unsubscribed');
 
 const setSubscribeMessage = async () => {
 	const registration = await navigator.serviceWorker.ready;
 	const subscription = await registration.pushManager.getSubscription();
-	getSubscribedElement().setAttribute(
+
+	subscribedElement.setAttribute(
 		'style',
 		`display: ${subscription ? 'block' : 'none'};`
 	);
-	getUnsubscribedElement().setAttribute(
+	unsubscribedElement.setAttribute(
 		'style',
 		`display: ${subscription ? 'none' : 'block'};`
 	);
