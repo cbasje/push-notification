@@ -1,0 +1,1 @@
+Inspiration: [https://felixgerschau.com/web-push-notifications-tutorial/#send-the-subscription-to-the-backend](https://felixgerschau.com/web-push-notifications-tutorial/#send-the-subscription-to-the-backend)
