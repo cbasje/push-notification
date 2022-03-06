@@ -6,9 +6,6 @@ import webpush from './webpushConfig';
 
 import { post, remove, broadcast } from './subscriptionController';
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const app = express();
 
 // Serve all files in client
@@ -22,6 +19,6 @@ app.get('/broadcast', broadcast);
 webpush();
 
 // start the Express server
-app.listen(process.env.PORT || 8080, () => {
-	console.log(`server started at http://localhost:${8080}`);
+app.listen(process.env.PORT || 3000, () => {
+	console.log(`server started at http://localhost:${3000}`);
 });

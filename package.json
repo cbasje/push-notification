@@ -2,7 +2,7 @@
 	"name": "push-notification",
 	"version": "1.0.0",
 	"description": "Making an app with push notifications.",
-	"main": "dist/app/index.js",
+	"main": "dist/index.js",
 	"author": "Sebastiaan Benjamins",
 	"license": "MIT",
 	"private": true,
@@ -10,8 +10,7 @@
 		"start": "node dist/index.js",
 		"serve": "ts-node ./src/index.ts",
 		"dev": "nodemon ./src/index.ts",
-		"dev-schedule": "nodemon ./src/schedule.ts",
-		"build": "tsc"
+		"build": "tsc && cp -r ./src/public dist"
 	},
 	"dependencies": {
 		"@types/body-parser": "^1.19.2",
