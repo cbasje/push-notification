@@ -100,6 +100,15 @@ window.broadcast = async () => {
 		headers: {
 			'content-type': 'application/json',
 		},
+		body: {
+			notification: {
+				tag: 'message1',
+				title: 'Hey, this is a push notification!',
+				body: 'what?',
+				image: '/image.jpeg',
+				url: 'https://csrdelft.nl',
+			},
+		},
 	});
 };
 
