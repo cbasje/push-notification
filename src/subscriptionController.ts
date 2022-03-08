@@ -54,7 +54,13 @@ export const broadcast = async (
 	next: NextFunction
 ): Promise<void> => {
 	try {
-		const notification = req.body.notification;
+		const notification = {
+			tag: 'message1',
+			title: 'Hey, this is a push notification!',
+			body: 'what?',
+			image: '/image.jpeg',
+			url: 'https://csrdelft.nl',
+		};
 
 		const subscriptions = await subscriptionRepository.getAll();
 

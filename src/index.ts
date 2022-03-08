@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 app.post('/subscription', post);
 app.delete('/subscription', remove);
-app.post('/broadcast', broadcast);
+app.get('/broadcast', broadcast);
 
 webpush();
 
