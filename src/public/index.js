@@ -28,7 +28,9 @@ const unsubscribedElement = document.getElementById('unsubscribed');
 const notAvailableElement = document.getElementById('not-available');
 
 const setSubscribeMessage = async () => {
-	const registration = await navigator.serviceWorker.ready;
+	const registration = await navigator.serviceWorker.ready.catch((err) => {
+		console.error('Registration: ', err);
+	});
 
 	console.log(registration.pushManager);
 	if (!registration.pushManager) {
@@ -38,7 +40,11 @@ const setSubscribeMessage = async () => {
 		return;
 	}
 
-	const subscription = await registration.pushManager.getSubscription();
+	const subscription = await registration.pushManager
+		.getSubscription()
+		.catch((err) => {
+			console.error('Subscription: ', err);
+		});
 
 	notAvailableElement.setAttribute('style', 'display: none');
 	subscribedElement.setAttribute(
@@ -54,43 +60,60 @@ const setSubscribeMessage = async () => {
 window.subscribe = async () => {
 	if (!('serviceWorker' in navigator)) return;
 
-	const registration = await navigator.serviceWorker.ready;
-
-	// Subscribe to push notifications
-	const subscription = await registration.pushManager.subscribe({
-		userVisibleOnly: true,
-		applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+	const registration = await navigator.serviceWorker.ready.catch((err) => {
+		console.error('Registration: ', err);
 	});
 
-	const response = await fetch('/subscription', {
-		method: 'POST',
-		body: JSON.stringify(subscription),
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
+	try {
+		// Subscribe to push notifications
+		const subscription = await registration.pushManager.subscribe({
+			userVisibleOnly: true,
+			applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+		});
 
-	if (response.ok) {
-		setSubscribeMessage();
+		const response = await fetch('/subscription', {
+			method: 'POST',
+			body: JSON.stringify(subscription),
+			headers: {
+				'content-type': 'application/json',
+			},
+		});
+
+		if (response.ok) {
+			setSubscribeMessage();
+		}
+	} catch (err) {
+		console.error('Subscribing...: ', err);
 	}
 };
 
 window.unsubscribe = async () => {
-	const registration = await navigator.serviceWorker.ready;
-	const subscription = await registration.pushManager.getSubscription();
+	const registration = await navigator.serviceWorker.ready.catch((err) => {
+		console.error('Registration: ', err);
+	});
+	const subscription = await registration.pushManager
+		.getSubscription()
+		.catch((err) => {
+			console.error('Subscription: ', err);
+		});
+
 	if (!subscription) return;
 
-	const { endpoint } = subscription;
-	const response = await fetch(`/subscription?endpoint=${endpoint}`, {
-		method: 'DELETE',
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
+	try {
+		const { endpoint } = subscription;
+		const response = await fetch(`/subscription?endpoint=${endpoint}`, {
+			method: 'DELETE',
+			headers: {
+				'content-type': 'application/json',
+			},
+		});
 
-	if (response.ok) {
-		await subscription.unsubscribe();
-		setSubscribeMessage();
+		if (response.ok) {
+			await subscription.unsubscribe();
+			setSubscribeMessage();
+		}
+	} catch (err) {
+		console.error('Unsubscribing...: ', err);
 	}
 };
 
