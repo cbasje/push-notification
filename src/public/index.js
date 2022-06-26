@@ -67,6 +67,17 @@ window.subscribe = async () => {
 		console.error('Registration: ', err);
 	});
 
+	const existingSubscription = await registration.pushManager
+		.getSubscription()
+		.catch((err) => {
+			console.error('existingSubscription: ', err);
+		});
+
+	if (existingSubscription) {
+		setSubscribeMessage();
+		return;
+	}
+
 	try {
 		// Subscribe to push notifications
 		const subscription = await registration.pushManager.subscribe({
