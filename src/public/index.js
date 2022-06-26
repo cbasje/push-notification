@@ -119,7 +119,7 @@ const subscribe = async () => {
 		});
 
 		if (response.ok) {
-			localStorage.setItem(PUSH_ENDPOINT_KEY, subscription.id);
+			localStorage.setItem(PUSH_ENDPOINT_KEY, response.id);
 		}
 	} catch (err) {
 		console.error('Subscribing...: ', err);
