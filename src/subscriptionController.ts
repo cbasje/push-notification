@@ -20,6 +20,7 @@ export const post = async (
 		res.status(201).json(newSubscription);
 	} catch (e) {
 		next(e);
+		res.sendStatus(500);
 	}
 };
 
@@ -38,6 +39,7 @@ export const remove = async (
 		const successful = await subscriptionRepository.deleteByEndpoint(
 			endpoint
 		);
+
 		if (successful) {
 			res.sendStatus(200);
 		} else {
@@ -45,6 +47,7 @@ export const remove = async (
 		}
 	} catch (e) {
 		next(e);
+		res.sendStatus(500);
 	}
 };
 
@@ -59,22 +62,24 @@ export const broadcast = async (
 		const subscriptions = await subscriptionRepository.getAll();
 
 		subscriptions.forEach(async (subscription) => {
-			try {
-				await webpush.sendNotification(
+			await webpush
+				.sendNotification(
 					{
 						endpoint: subscription.endpoint,
 						keys: subscription.keys,
 					},
 					JSON.stringify(notification)
-				);
-			} catch (error) {
-				console.error(error);
-			}
+				)
+				.catch((error) => {
+					console.error(error);
+				});
 		});
 
 		res.sendStatus(200);
 	} catch (e) {
 		next(e);
 		console.error(e);
+
+		res.sendStatus(500);
 	}
 };
