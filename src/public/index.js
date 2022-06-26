@@ -141,7 +141,7 @@ window.broadcast = async () => {
 			tag: 'csr-notification-123',
 			title: titleInput.value,
 			body: messageInput.value,
-			image: '/image.jpeg',
+			image: 'https://push-notifications-cbasje.herokuapp.com/image.jpeg',
 			url: urlInput.value,
 		}),
 	});
