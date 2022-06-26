@@ -110,6 +110,7 @@ const subscribe = async () => {
 				'content-type': 'application/json',
 			},
 		});
+		console.log('Subscription response: ', response);
 
 		if (response.ok) {
 			localStorage.setItem(PUSH_ENDPOINT_KEY, response.id);
