@@ -58,25 +58,21 @@ export const broadcast = async (
 
 		const subscriptions = await subscriptionRepository.getAll();
 
-		// const notifications: Promise<SendResult>[] = [];
+		const notifications: Promise<SendResult>[] = [];
 
 		subscriptions.forEach(async (subscription) => {
-			// notifications.push(
-			try {
-				await webpush.sendNotification(
+			notifications.push(
+				webpush.sendNotification(
 					{
 						endpoint: subscription.endpoint,
 						keys: subscription.keys,
 					},
 					JSON.stringify(notification)
-				);
-			} catch (err) {
-				console.error(err);
-			}
-			// );
+				)
+			);
 		});
 
-		// await Promise.all(notifications);
+		await Promise.all(notifications);
 		res.sendStatus(200);
 	} catch (e) {
 		next(e);
