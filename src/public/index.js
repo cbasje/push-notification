@@ -56,6 +56,10 @@ const checkNotificationSubscription = async () => {
 
 	buttons.setAttribute('style', 'display: block');
 
+	const registration = await navigator.serviceWorker.ready.catch((err) => {
+		console.error('Registration: ', err);
+	});
+
 	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
 	if (pushEndpoint) {
 		const existingSubscription = await registration.pushManager
