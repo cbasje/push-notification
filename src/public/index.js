@@ -45,17 +45,6 @@ const checkPushAvailability = async () => {
 	if (!registration.pushManager) {
 		return false;
 	}
-
-	const subscription = await registration.pushManager
-		.getSubscription()
-		.catch((err) => {
-			console.error('Subscription: ', err);
-		});
-
-	if (!subscription) {
-		return false;
-	}
-
 	return true;
 };
 
