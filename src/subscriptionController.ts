@@ -53,26 +53,25 @@ export const broadcast = async (
 	res: Response,
 	next: NextFunction
 ): Promise<void> => {
-	try {
-		const notification = req.body;
+	const notification = req.body;
 
+	try {
 		const subscriptions = await subscriptionRepository.getAll();
 
-		const notifications: Promise<SendResult>[] = [];
-
 		subscriptions.forEach(async (subscription) => {
-			notifications.push(
-				webpush.sendNotification(
+			try {
+				await webpush.sendNotification(
 					{
 						endpoint: subscription.endpoint,
 						keys: subscription.keys,
 					},
 					JSON.stringify(notification)
-				)
-			);
+				);
+			} catch (error) {
+				console.error(error);
+			}
 		});
 
-		await Promise.all(notifications);
 		res.sendStatus(200);
 	} catch (e) {
 		next(e);

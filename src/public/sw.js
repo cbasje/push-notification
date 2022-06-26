@@ -1,4 +1,4 @@
-self.addEventListener('push', (e) => {
+self.addEventListener('push', (event) => {
 	let messageData = e.data.json();
 
 	event.waitUntil(
