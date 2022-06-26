@@ -61,7 +61,7 @@ const checkNotificationSubscription = async () => {
 	});
 
 	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
-	if (pushEndpoint) {
+	if (pushEndpoint !== undefined) {
 		const existingSubscription = await registration.pushManager
 			.getSubscription()
 			.catch((err) => {
