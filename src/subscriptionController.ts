@@ -62,6 +62,8 @@ export const broadcast = async (
 		const subscriptions = await subscriptionRepository.getAll();
 
 		subscriptions.forEach(async (subscription) => {
+			console.log(`Sending notification to ${subscription.endpoint}`);
+
 			await webpush
 				.sendNotification(
 					{
