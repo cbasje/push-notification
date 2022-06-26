@@ -113,7 +113,8 @@ const subscribe = async () => {
 		console.log('Subscription response: ', response);
 
 		if (response.ok) {
-			localStorage.setItem(PUSH_ENDPOINT_KEY, response.id);
+			const data = await response.json();
+			localStorage.setItem(PUSH_ENDPOINT_KEY, data.id);
 		}
 	} catch (err) {
 		console.error('Subscribing...: ', err);
