@@ -61,13 +61,13 @@ const checkNotificationSubscription = async () => {
 	});
 
 	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
-	if (pushEndpoint !== undefined) {
-		const existingSubscription = await registration.pushManager
-			.getSubscription()
-			.catch((err) => {
-				console.error('Existing subscription: ', err);
-			});
+	const existingSubscription = await registration.pushManager
+		.getSubscription()
+		.catch((err) => {
+			console.error('Existing subscription: ', err);
+		});
 
+	if (pushEndpoint !== undefined && existingSubscription) {
 		const response = await fetch('/subscription', {
 			method: 'PATCH',
 			body: JSON.stringify({ pushEndpoint, ...existingSubscription }),
