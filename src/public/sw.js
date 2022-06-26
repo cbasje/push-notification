@@ -20,13 +20,29 @@ self.addEventListener('push', (event) => {
 self.addEventListener(
 	'notificationclick',
 	async function (event) {
+		console.log('On notification click: ', event.notification.tag);
+		event.notification.close();
+
 		if (!event.action) return;
 
-		if (clients.openWindow) {
-			// This always opens a new browser tab,
-			// even if the URL happens to already be open in a tab.
-			clients.openWindow(event.action);
-		}
+		// This looks to see if the current is already open and
+		// focuses if it is
+		event.waitUntil(
+			clients
+				.matchAll({
+					type: 'window',
+				})
+				.then(function (clientList) {
+					for (var i = 0; i < clientList.length; i++) {
+						var client = clientList[i];
+						if (client.url == '/' && 'focus' in client)
+							return client.focus();
+					}
+					if (clients.openWindow) {
+						return clients.openWindow(event.action);
+					}
+				})
+		);
 	},
 	false
 );
