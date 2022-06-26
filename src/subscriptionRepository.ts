@@ -24,21 +24,21 @@ export const create = async (
 };
 
 export const deleteByEndpoint = async (endpoint: string): Promise<boolean> => {
-	// const result = await Subscription.remove({ endpoint });
-	// return result.ok === 1 && result.deletedCount > 0;
-	console.log('Delete');
-	const records = await base('Table 1')
-		.select({
-			view: 'Grid view',
-			filterByFormula: `endpoint = '${endpoint}'`,
-		})
-		.all();
+	try {
+		const records = await base('Table 1')
+			.select({
+				view: 'Grid view',
+				filterByFormula: `endpoint = '${endpoint}'`,
+			})
+			.all();
 
-	if (records.length > 0) {
-		records.forEach(async (rec) => {
-			await base('Table 1').destroy(rec.getId());
-		});
-		return true;
+		if (records.length > 0) {
+			await base('Table 1').destroy(records[0].getId());
+			return true;
+		}
+	} catch (error) {
+		console.error(error);
+		return false;
 	}
 
 	return false;
