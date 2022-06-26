@@ -13,7 +13,6 @@ export const create = async (
 	subscription: Subscription
 ): Promise<SavedSubscription> => {
 	const savedSubscription = await base('Table 1').create(subscription);
-	console.log(savedSubscription.get('keys'));
 
 	const keys = JSON.parse(savedSubscription.get('keys') as string);
 	return {
@@ -28,7 +27,21 @@ export const deleteByEndpoint = async (endpoint: string): Promise<boolean> => {
 	// const result = await Subscription.remove({ endpoint });
 	// return result.ok === 1 && result.deletedCount > 0;
 	console.log('Delete');
-	return true;
+	const records = await base('Table 1')
+		.select({
+			view: 'Grid view',
+			filterByFormula: `endpoint = '${endpoint}'`,
+		})
+		.all();
+
+	if (records.length > 0) {
+		records.forEach(async (rec) => {
+			await base('Table 1').destroy(rec.getId());
+		});
+		return true;
+	}
+
+	return false;
 };
 
 export const getAll = async (): Promise<SavedSubscription[]> => {
