@@ -19,8 +19,8 @@ export const subscribe = async (
 		// Send 201 - resource created
 		res.status(201).json(newSubscription);
 	} catch (e) {
+		console.error(e);
 		next(e);
-		res.sendStatus(500);
 	}
 };
 
@@ -41,8 +41,8 @@ export const renew = async (
 		// Send 201 - resource created
 		res.status(201).json(newSubscription);
 	} catch (e) {
+		console.error(e);
 		next(e);
-		res.sendStatus(500);
 	}
 };
 
@@ -66,8 +66,8 @@ export const remove = async (
 			res.sendStatus(500);
 		}
 	} catch (e) {
+		console.error(e);
 		next(e);
-		res.sendStatus(500);
 	}
 };
 
@@ -99,9 +99,7 @@ export const broadcast = async (
 
 		res.sendStatus(200);
 	} catch (e) {
-		next(e);
 		console.error(e);
-
-		res.sendStatus(500);
+		next(e);
 	}
 };
