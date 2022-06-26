@@ -27,12 +27,15 @@ const subscribedElement = document.getElementById('subscribed');
 const unsubscribedElement = document.getElementById('unsubscribed');
 const notAvailableElement = document.getElementById('not-available');
 
+const titleInput = document.getElementById('title');
+const messageInput = document.getElementById('message');
+const urlInput = document.getElementById('url');
+
 const setSubscribeMessage = async () => {
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
 	});
 
-	console.log(registration.pushManager);
 	if (!registration.pushManager) {
 		notAvailableElement.setAttribute('style', 'display: block');
 		subscribedElement.setAttribute('style', 'display: none');
@@ -119,10 +122,17 @@ window.unsubscribe = async () => {
 
 window.broadcast = async () => {
 	await fetch('/broadcast', {
-		method: 'GET',
+		method: 'POST',
 		headers: {
 			'content-type': 'application/json',
 		},
+		body: JSON.stringify({
+			tag: 'csr-notification-123',
+			title: titleInput.value,
+			body: messageInput.value,
+			image: '/image.jpeg',
+			url: urlInput.value,
+		}),
 	});
 };
 
