@@ -21,11 +21,6 @@ self.addEventListener('push', (event) => {
 self.addEventListener(
 	'notificationclick',
 	async function (event) {
-		console.log(
-			'On notification click: ',
-			event.notification.tag,
-			event.action
-		);
 		event.notification.close();
 
 		if (clients.openWindow) {

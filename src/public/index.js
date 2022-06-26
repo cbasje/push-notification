@@ -5,6 +5,9 @@ if ('serviceWorker' in navigator) {
 	});
 }
 
+const PUSH_ENDPOINT_KEY = 'pushEndpoint';
+let isPushAvailable = false;
+
 const publicVapidKey =
 	'BNodLgNO2YdnKllWbx8oxTOQqr9J0jh5IvQ1lfI5Wgsfdt8p-RXpZ5T6qRQFjNmYnJ7uPFQEI9v0eQ06nCYsRGg';
 
@@ -23,24 +26,24 @@ const urlBase64ToUint8Array = (base64String) => {
 	return outputArray;
 };
 
-const subscribedElement = document.getElementById('subscribed');
-const unsubscribedElement = document.getElementById('unsubscribed');
+const form = document.getElementById('form');
+const buttons = document.getElementById('buttons');
 const notAvailableElement = document.getElementById('not-available');
+
+const subscribeButton = document.getElementById('subscribe');
+const unsubscribeButton = document.getElementById('unsubscribe');
 
 const titleInput = document.getElementById('title');
 const messageInput = document.getElementById('message');
 const urlInput = document.getElementById('url');
 
-const setSubscribeMessage = async () => {
+const checkPushAvailability = async () => {
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
 	});
 
 	if (!registration.pushManager) {
-		notAvailableElement.setAttribute('style', 'display: block');
-		subscribedElement.setAttribute('style', 'display: none');
-		unsubscribedElement.setAttribute('style', 'display: none');
-		return;
+		return false;
 	}
 
 	const subscription = await registration.pushManager
@@ -49,34 +52,56 @@ const setSubscribeMessage = async () => {
 			console.error('Subscription: ', err);
 		});
 
-	notAvailableElement.setAttribute('style', 'display: none');
-	subscribedElement.setAttribute(
-		'style',
-		`display: ${subscription ? 'block' : 'none'};`
-	);
-	unsubscribedElement.setAttribute(
-		'style',
-		`display: ${subscription ? 'none' : 'block'};`
-	);
+	if (!subscription) {
+		return false;
+	}
+
+	return true;
 };
 
-window.subscribe = async () => {
-	if (!('serviceWorker' in navigator)) return;
+const checkNotificationSubscription = async () => {
+	if (!isPushAvailable) {
+		notAvailableElement.setAttribute('style', 'display: block');
+		return;
+	}
+
+	buttons.setAttribute('style', 'display: block');
+
+	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
+	if (pushEndpoint) {
+		const existingSubscription = await registration.pushManager
+			.getSubscription()
+			.catch((err) => {
+				console.error('Existing subscription: ', err);
+			});
+
+		const response = await fetch('/subscription', {
+			method: 'PATCH',
+			body: JSON.stringify({ pushEndpoint, ...existingSubscription }),
+			headers: {
+				'content-type': 'application/json',
+			},
+		});
+
+		if (response.ok) {
+			console.log('Subscription renewed');
+		}
+	}
+};
+
+const main = async () => {
+	isPushAvailable = await checkPushAvailability();
+	await checkNotificationSubscription();
+};
+main();
+
+const subscribe = async () => {
+	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
+	if (!('serviceWorker' in navigator) || pushEndpoint) return;
 
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
 	});
-
-	const existingSubscription = await registration.pushManager
-		.getSubscription()
-		.catch((err) => {
-			console.error('existingSubscription: ', err);
-		});
-
-	if (existingSubscription) {
-		setSubscribeMessage();
-		return;
-	}
 
 	try {
 		// Subscribe to push notifications
@@ -94,14 +119,15 @@ window.subscribe = async () => {
 		});
 
 		if (response.ok) {
-			setSubscribeMessage();
+			localStorage.setItem(PUSH_ENDPOINT_KEY, subscription.id);
 		}
 	} catch (err) {
 		console.error('Subscribing...: ', err);
 	}
 };
+subscribeButton.onclick = subscribe;
 
-window.unsubscribe = async () => {
+const unsubscribe = async () => {
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
 	});
@@ -114,8 +140,8 @@ window.unsubscribe = async () => {
 	if (!subscription) return;
 
 	try {
-		const { endpoint } = subscription;
-		const response = await fetch(`/subscription?endpoint=${endpoint}`, {
+		const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
+		const response = await fetch(`/subscription?id=${pushEndpoint}`, {
 			method: 'DELETE',
 			headers: {
 				'content-type': 'application/json',
@@ -124,14 +150,15 @@ window.unsubscribe = async () => {
 
 		if (response.ok) {
 			await subscription.unsubscribe();
-			setSubscribeMessage();
+			localStorage.removeItem(PUSH_ENDPOINT_KEY);
 		}
 	} catch (err) {
 		console.error('Unsubscribing...: ', err);
 	}
 };
+unsubscribeButton.onclick = unsubscribe;
 
-window.broadcast = async () => {
+const broadcast = async () => {
 	await fetch('/broadcast', {
 		method: 'POST',
 		headers: {
@@ -146,5 +173,7 @@ window.broadcast = async () => {
 		}),
 	});
 };
-
-setSubscribeMessage();
+form.onsubmit = (e) => {
+	e.preventDefault();
+	broadcast();
+};

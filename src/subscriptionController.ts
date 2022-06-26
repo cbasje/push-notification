@@ -2,7 +2,29 @@ import { NextFunction, Request, Response } from 'express';
 import * as subscriptionRepository from './subscriptionRepository';
 import webpush, { SendResult } from 'web-push';
 
-export const post = async (
+export const subscribe = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	try {
+		const subscription = req.body;
+
+		const newSubscription = await subscriptionRepository.create({
+			endpoint: subscription.endpoint,
+			expirationTime: subscription.expirationTime,
+			keys: JSON.stringify(subscription.keys),
+		});
+
+		// Send 201 - resource created
+		res.status(201).json(newSubscription);
+	} catch (e) {
+		next(e);
+		res.sendStatus(500);
+	}
+};
+
+export const renew = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -30,15 +52,13 @@ export const remove = async (
 	next: NextFunction
 ): Promise<void> => {
 	try {
-		const endpoint: string = req.query.endpoint as string;
-		if (!endpoint) {
+		const id: string = req.query.id as string;
+		if (!id) {
 			res.sendStatus(400);
 			return;
 		}
 
-		const successful = await subscriptionRepository.deleteByEndpoint(
-			endpoint
-		);
+		const successful = await subscriptionRepository.deleteById(id);
 
 		if (successful) {
 			res.sendStatus(200);

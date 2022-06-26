@@ -23,25 +23,32 @@ export const create = async (
 	};
 };
 
-export const deleteByEndpoint = async (endpoint: string): Promise<boolean> => {
-	try {
-		const records = await base('Table 1')
-			.select({
-				view: 'Grid view',
-				filterByFormula: `endpoint = '${endpoint}'`,
-			})
-			.all();
+export const renew = async (payload: {
+	id: string;
+	subscription: Subscription;
+}): Promise<SavedSubscription> => {
+	const savedSubscription = await base('Table 1').update(
+		payload.id,
+		payload.subscription
+	);
 
-		if (records.length > 0) {
-			await base('Table 1').destroy(records[0].getId());
-			return true;
-		}
+	const keys = JSON.parse(savedSubscription.get('keys') as string);
+	return {
+		id: savedSubscription.getId(),
+		endpoint: savedSubscription.get('endpoint') as string,
+		expirationTime: savedSubscription.get('expirationTime') as number,
+		keys,
+	};
+};
+
+export const deleteById = async (id: string): Promise<boolean> => {
+	try {
+		await base('Table 1').destroy(id);
+		return true;
 	} catch (error) {
 		console.error(error);
 		return false;
 	}
-
-	return false;
 };
 
 export const getAll = async (): Promise<SavedSubscription[]> => {

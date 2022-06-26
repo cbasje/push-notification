@@ -8,17 +8,32 @@
 	</head>
 	<body>
 		<h1>Push notification center</h1>
-		<h3 id="subscribed">You are subscribed</h3>
-		<h3 id="unsubscribed">You are not subscribed</h3>
-		<h3 id="not-available">Push API is not available</h3>
-		
-		<input type="text" name="title" id="title" value="Hey, this is a push notification!">
-		<input type="text" name="message" id="message">
-		<input type="text" name="url" id="url" value="https://csrdelft.nl">
+		<h3 id="not-available" style="display: none">
+			Push API is not available
+		</h3>
 
-		<button onclick="broadcast()">Send push notification</button>
-		<button onclick="subscribe()">Subscribe</div>
-		<button onclick="unsubscribe()">Unsubscribe</button>
+		<div id="buttons" style="display: none">
+			<button id="subscribe">Ja</button>
+			<button id="unsubscribe">Nee</button>
+		</div>
+
+		<form id="form">
+			<input
+				type="text"
+				name="title"
+				id="title"
+				value="Hey, this is a push notification!"
+			/>
+			<input type="text" name="message" id="message" />
+			<input
+				type="text"
+				name="url"
+				id="url"
+				value="https://csrdelft.nl"
+			/>
+
+			<button type="submit">Send push notification</button>
+		</form>
 		<script src="index.js"></script>
 	</body>
 </html>

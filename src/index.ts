@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 
 import webpush from './webpushConfig';
 
-import { post, remove, broadcast } from './subscriptionController';
+import { subscribe, renew, remove, broadcast } from './subscriptionController';
 
 const app = express();
 
@@ -12,7 +12,8 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
-app.post('/subscription', post);
+app.post('/subscription', subscribe);
+app.patch('/subscription', renew);
 app.delete('/subscription', remove);
 app.post('/broadcast', broadcast);
 
