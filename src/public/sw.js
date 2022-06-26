@@ -1,5 +1,5 @@
 self.addEventListener('push', (event) => {
-	let messageData = e.data.json();
+	let messageData = event.data.json();
 
 	event.waitUntil(
 		self.registration.showNotification(messageData.title, {
