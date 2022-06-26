@@ -7,6 +7,7 @@ self.addEventListener('push', (event) => {
 			body: messageData.body,
 			icon: '/favicon.ico',
 			image: messageData.image,
+			data: messageData.url,
 			actions: [
 				{
 					action: messageData.url,
@@ -27,26 +28,15 @@ self.addEventListener(
 		);
 		event.notification.close();
 
-		if (!event.action) return;
-
-		// This looks to see if the current is already open and
-		// focuses if it is
-		event.waitUntil(
-			clients
-				.matchAll({
-					type: 'window',
-				})
-				.then(function (clientList) {
-					for (var i = 0; i < clientList.length; i++) {
-						var client = clientList[i];
-						if (client.url == '/' && 'focus' in client)
-							return client.focus();
-					}
-					if (clients.openWindow) {
-						return clients.openWindow(event.action);
-					}
-				})
-		);
+		if (clients.openWindow) {
+			if (event.action) {
+				// User selected an action.
+				clients.openWindow(event.action);
+			} else {
+				// User selected (e.g., clicked in) the main body of notification.
+				clients.openWindow(event.notification.data);
+			}
+		}
 	},
 	false
 );
