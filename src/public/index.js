@@ -68,9 +68,10 @@ const checkNotificationSubscription = async () => {
 		});
 
 	if (pushEndpoint !== undefined && existingSubscription) {
+		console.log('Subscription exists: ', { existingSubscription });
 		const response = await fetch('/subscription', {
 			method: 'PATCH',
-			body: JSON.stringify({ pushEndpoint, ...existingSubscription }),
+			body: JSON.stringify({ id: pushEndpoint, ...existingSubscription }),
 			headers: {
 				'content-type': 'application/json',
 			},

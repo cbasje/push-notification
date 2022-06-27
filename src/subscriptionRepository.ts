@@ -26,20 +26,26 @@ export const create = async (
 export const renew = async (
 	id: string,
 	subscription: Subscription
-): Promise<SavedSubscription> => {
-	const savedSubscription = await base('Table 1').update(id, subscription);
+): Promise<boolean> => {
+	try {
+		if (!id) {
+			throw new Error('id is required');
+		}
 
-	const keys = JSON.parse(savedSubscription.get('keys') as string);
-	return {
-		id: savedSubscription.getId(),
-		endpoint: savedSubscription.get('endpoint') as string,
-		expirationTime: savedSubscription.get('expirationTime') as number,
-		keys,
-	};
+		await base('Table 1').update(id, subscription);
+		return true;
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
 };
 
 export const deleteById = async (id: string): Promise<boolean> => {
 	try {
+		if (!id) {
+			throw new Error('id is required');
+		}
+
 		await base('Table 1').destroy(id);
 		return true;
 	} catch (error) {
