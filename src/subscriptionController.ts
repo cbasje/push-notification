@@ -55,7 +55,7 @@ export const remove = async (
 	next: NextFunction
 ): Promise<void> => {
 	try {
-		const id: string = req.query.id as string;
+		const id: string = req.query.refreshId as string;
 		const successful = await subscriptionRepository.deleteById(id);
 
 		if (successful) {

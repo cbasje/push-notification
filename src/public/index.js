@@ -5,11 +5,11 @@ if ('serviceWorker' in navigator) {
 	});
 }
 
-const PUSH_ENDPOINT_KEY = 'pushEndpoint';
-let isPushAvailable = false;
-
-const publicVapidKey =
+const PUSH_REFRESH = 'pushRefresh';
+const PUBLIC_VAPID_KEY =
 	'BNodLgNO2YdnKllWbx8oxTOQqr9J0jh5IvQ1lfI5Wgsfdt8p-RXpZ5T6qRQFjNmYnJ7uPFQEI9v0eQ06nCYsRGg';
+
+let isPushAvailable = false;
 
 const urlBase64ToUint8Array = (base64String) => {
 	const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -60,21 +60,21 @@ const checkNotificationSubscription = async () => {
 		console.error('Registration: ', err);
 	});
 
-	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
+	const pushRefresh = localStorage.getItem(PUSH_REFRESH);
 	const existingSubscription = await registration.pushManager
 		.getSubscription()
 		.catch((err) => {
 			console.error('Existing subscription: ', err);
 		});
 
-	if (pushEndpoint !== undefined && pushEndpoint !== null) {
+	if (pushRefresh !== undefined && pushRefresh !== null) {
 		let response;
 
 		if (existingSubscription) {
 			response = await fetch('/subscription', {
 				method: 'PATCH',
 				body: JSON.stringify({
-					id: pushEndpoint,
+					id: pushRefresh,
 					...existingSubscription.toJSON(),
 				}),
 				headers: {
@@ -84,13 +84,13 @@ const checkNotificationSubscription = async () => {
 		} else {
 			const subscription = await registration.pushManager.subscribe({
 				userVisibleOnly: true,
-				applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+				applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
 			});
 
 			response = await fetch('/subscription', {
 				method: 'PATCH',
 				body: JSON.stringify({
-					id: pushEndpoint,
+					id: pushRefresh,
 					...subscription.toJSON(),
 				}),
 				headers: {
@@ -112,8 +112,8 @@ const main = async () => {
 main();
 
 const subscribe = async () => {
-	const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
-	if (!('serviceWorker' in navigator) || pushEndpoint) return;
+	const pushRefresh = localStorage.getItem(PUSH_REFRESH);
+	if (!('serviceWorker' in navigator) || pushRefresh) return;
 
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
@@ -123,7 +123,7 @@ const subscribe = async () => {
 		// Subscribe to push notifications
 		const subscription = await registration.pushManager.subscribe({
 			userVisibleOnly: true,
-			applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+			applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
 		});
 
 		const response = await fetch('/subscription', {
@@ -137,7 +137,7 @@ const subscribe = async () => {
 
 		if (response.ok) {
 			const data = await response.json();
-			localStorage.setItem(PUSH_ENDPOINT_KEY, data.id);
+			localStorage.setItem(PUSH_REFRESH, data.id);
 		}
 	} catch (err) {
 		console.error('Subscribing...: ', err);
@@ -158,8 +158,8 @@ const unsubscribe = async () => {
 	if (!subscription) return;
 
 	try {
-		const pushEndpoint = localStorage.getItem(PUSH_ENDPOINT_KEY);
-		const response = await fetch(`/subscription?id=${pushEndpoint}`, {
+		const pushRefresh = localStorage.getItem(PUSH_REFRESH);
+		const response = await fetch(`/subscription?refreshId=${pushRefresh}`, {
 			method: 'DELETE',
 			headers: {
 				'content-type': 'application/json',
@@ -168,7 +168,7 @@ const unsubscribe = async () => {
 
 		if (response.ok) {
 			await subscription.unsubscribe();
-			localStorage.removeItem(PUSH_ENDPOINT_KEY);
+			localStorage.removeItem(PUSH_REFRESH);
 		}
 	} catch (err) {
 		console.error('Unsubscribing...: ', err);
