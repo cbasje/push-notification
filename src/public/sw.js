@@ -1,3 +1,5 @@
+const PUSH_REFRESH = 'pushRefresh';
+
 self.addEventListener('push', (event) => {
 	let messageData = event.data.json();
 
@@ -43,9 +45,13 @@ self.addEventListener(
 			swRegistration.pushManager
 				.subscribe(event.oldSubscription.options)
 				.then((subscription) => {
+					const pushRefresh = localStorage.getItem(PUSH_REFRESH);
 					return fetch('/subscription', {
-						method: 'POST',
-						body: JSON.stringify(subscription),
+						method: 'PATCH',
+						body: JSON.stringify({
+							id: pushRefresh,
+							...subscription.toJSON(),
+						}),
 						headers: {
 							'content-type': 'application/json',
 						},
