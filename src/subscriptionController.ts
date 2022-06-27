@@ -32,11 +32,14 @@ export const renew = async (
 	try {
 		const subscription = req.body;
 
-		const newSubscription = await subscriptionRepository.create({
-			endpoint: subscription.endpoint,
-			expirationTime: subscription.expirationTime,
-			keys: JSON.stringify(subscription.keys),
-		});
+		const newSubscription = await subscriptionRepository.renew(
+			subscription.id,
+			{
+				endpoint: subscription.endpoint,
+				expirationTime: subscription.expirationTime,
+				keys: JSON.stringify(subscription.keys),
+			}
+		);
 
 		// Send 201 - resource created
 		res.status(201).json(newSubscription);

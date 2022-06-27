@@ -23,14 +23,11 @@ export const create = async (
 	};
 };
 
-export const renew = async (payload: {
-	id: string;
-	subscription: Subscription;
-}): Promise<SavedSubscription> => {
-	const savedSubscription = await base('Table 1').update(
-		payload.id,
-		payload.subscription
-	);
+export const renew = async (
+	id: string,
+	subscription: Subscription
+): Promise<SavedSubscription> => {
+	const savedSubscription = await base('Table 1').update(id, subscription);
 
 	const keys = JSON.parse(savedSubscription.get('keys') as string);
 	return {
