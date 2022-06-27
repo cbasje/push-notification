@@ -67,18 +67,37 @@ const checkNotificationSubscription = async () => {
 			console.error('Existing subscription: ', err);
 		});
 
-	if (pushEndpoint !== undefined && existingSubscription) {
-		console.log('Subscription exists: ', { existingSubscription });
-		const response = await fetch('/subscription', {
-			method: 'PATCH',
-			body: JSON.stringify({
-				id: pushEndpoint,
-				...existingSubscription.toJSON(),
-			}),
-			headers: {
-				'content-type': 'application/json',
-			},
-		});
+	if (pushEndpoint !== undefined && pushEndpoint !== null) {
+		let response;
+
+		if (existingSubscription) {
+			response = await fetch('/subscription', {
+				method: 'PATCH',
+				body: JSON.stringify({
+					id: pushEndpoint,
+					...existingSubscription.toJSON(),
+				}),
+				headers: {
+					'content-type': 'application/json',
+				},
+			});
+		} else {
+			const subscription = await registration.pushManager.subscribe({
+				userVisibleOnly: true,
+				applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+			});
+
+			response = await fetch('/subscription', {
+				method: 'PATCH',
+				body: JSON.stringify({
+					id: pushEndpoint,
+					...subscription.toJSON(),
+				}),
+				headers: {
+					'content-type': 'application/json',
+				},
+			});
+		}
 
 		if (response.ok) {
 			console.log('Subscription renewed');
