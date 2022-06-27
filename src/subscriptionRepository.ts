@@ -12,6 +12,10 @@ var base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
 export const create = async (
 	subscription: Subscription
 ): Promise<SavedSubscription> => {
+	if (!subscription) {
+		throw new Error("'subscription' is required");
+	}
+
 	const savedSubscription = await base('Table 1').create(subscription);
 
 	const keys = JSON.parse(savedSubscription.get('keys') as string);
@@ -29,7 +33,10 @@ export const renew = async (
 ): Promise<boolean> => {
 	try {
 		if (!id) {
-			throw new Error('id is required');
+			throw new Error("'id' is required");
+		}
+		if (!subscription) {
+			throw new Error("'subscription' is required");
 		}
 
 		await base('Table 1').update(id, subscription);
