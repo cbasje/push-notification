@@ -51,10 +51,9 @@ const checkPushAvailability = async () => {
 const checkNotificationSubscription = async () => {
 	if (!isPushAvailable) {
 		notAvailableElement.setAttribute('style', 'display: block');
+		buttons.setAttribute('style', 'display: none');
 		return;
 	}
-
-	buttons.setAttribute('style', 'display: block');
 
 	const registration = await navigator.serviceWorker.ready.catch((err) => {
 		console.error('Registration: ', err);
